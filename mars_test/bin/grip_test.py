@@ -76,10 +76,7 @@ class MoveItDemo:
         self.gripper_closed = [rospy.get_param(GRIPPER_PARAM + "/min_opening") + 0.01]
         self.gripper_neutral = [rospy.get_param(GRIPPER_PARAM + "/neutral",
                                                 (self.gripper_opened[0] + self.gripper_closed[0])/2.0) ]
-        rospy.loginfo("gripper opened at: " + str(self.gripper_opened))
-        rospy.loginfo("gripper closed at: " + str(self.gripper_closed))
-        rospy.loginfo("gripper neutral at: " + str(self.gripper_neutral))
-        rospy.loginfo("get param: "+str(rospy.get_param(GRIPPER_PARAM)))
+
 
         self.gripper_tighten = rospy.get_param(GRIPPER_PARAM + "/tighten", 1)
 
@@ -155,29 +152,29 @@ class MoveItDemo:
         gripper.set_joint_value_target(self.gripper_opened)
         if gripper.go() != True:
             rospy.logwarn("  Go failed")
-        rospy.loginfo("Going to user")
-        while(1):
-            txt = raw_input("Type o to open, c to close, n for neutral, q to quit: \n")
-            if txt == "o":
-                rospy.loginfo("Set Gripper: Open " + str(self.gripper_opened))
-                gripper.set_joint_value_target(self.gripper_opened)
-                if gripper.go() != True:
-                    rospy.logwarn("  Go failed")
-            elif txt == "c":
-                rospy.loginfo("Set Gripper: Close " + str(self.gripper_closed))
-                gripper.set_joint_value_target(self.gripper_closed)
-                if gripper.go() != True:
-                    rospy.logwarn("  Go failed")
-            elif txt == "n":
-                rospy.loginfo("Set Gripper: Neutral " + str(self.gripper_neutral))
-                gripper.set_joint_value_target(self.gripper_neutral)
-                if gripper.go() != True:
-                    rospy.logwarn("  Go failed")
-            elif txt == "q":
-                break;
-            else:
-                break;
-        rospy.loginfo("Back from user")
+        # rospy.loginfo("Going to user")
+        # while(1):
+        #     txt = raw_input("Type o to open, c to close, n for neutral, q to quit: \n")
+        #     if txt == "o":
+        #         rospy.loginfo("Set Gripper: Open " + str(self.gripper_opened))
+        #         gripper.set_joint_value_target(self.gripper_opened)
+        #         if gripper.go() != True:
+        #             rospy.logwarn("  Go failed")
+        #     elif txt == "c":
+        #         rospy.loginfo("Set Gripper: Close " + str(self.gripper_closed))
+        #         gripper.set_joint_value_target(self.gripper_closed)
+        #         if gripper.go() != True:
+        #             rospy.logwarn("  Go failed")
+        #     elif txt == "n":
+        #         rospy.loginfo("Set Gripper: Neutral " + str(self.gripper_neutral))
+        #         gripper.set_joint_value_target(self.gripper_neutral)
+        #         if gripper.go() != True:
+        #             rospy.logwarn("  Go failed")
+        #     elif txt == "q":
+        #         break;
+        #     else:
+        #         break;
+        # rospy.loginfo("Back from user")
 
 #From here
         #
@@ -189,8 +186,8 @@ class MoveItDemo:
         # box1_size = [0.1, 0.05, 0.05]
         # box2_size = [0.05, 0.05, 0.15]
         #
-        # # Set the target size [l, w, h]
-        # target_size = [0.02, 0.005, 0.12]
+        # Set the target size [l, w, h]
+        target_size = [0.014, 0.01, 0.035]
         #
         # # Add a table top and two boxes to the scene
         # table_pose = PoseStamped()
@@ -217,108 +214,128 @@ class MoveItDemo:
         # box2_pose.pose.orientation.w = 1.0
         # self.scene.add_box(box2_id, box2_pose, box2_size)
         #
-        # # Set the target pose in between the boxes and on the table
+        # Set the target pose in between the boxes and on the table
         # target_pose = PoseStamped()
         # target_pose.header.frame_id = REFERENCE_FRAME
-        # target_pose.pose.position.x = table_pose.pose.position.x - 0.03
-        # target_pose.pose.position.y = 0.1
-        # target_pose.pose.position.z = table_ground + table_size[2] + target_size[2] / 2.0
-        # target_pose.pose.orientation.w = 1.0
-        #
-        # # Add the target object to the scene
-        # self.scene.add_box(target_id, target_pose, target_size)
-        #
+        # target_pose.pose.position.x = 0.26338
+        # target_pose.pose.position.y = 0.16492
+        # target_pose.pose.position.z = 0.37705
+        # target_pose.pose.orientation.x = -0.01033
+        # target_pose.pose.orientation.y = 0.02875
+        # target_pose.pose.orientation.z = 0.33817
+        # target_pose.pose.orientation.w = 0.94058
+
+        target_pose = PoseStamped()
+        target_pose.header.frame_id = REFERENCE_FRAME
+        target_pose.pose.position.x = 0.36 - 0.03
+        target_pose.pose.position.y = 0.1
+        target_pose.pose.position.z = 0.4 + 0.01 + target_size[2] / 2.0
+        target_pose.pose.orientation.w = 1.0
+
+        # Add the target object to the scene
+        self.scene.add_box(target_id, target_pose, target_size)
+
         # # Make the table red and the boxes orange
         # self.setColor(table_id, 0.8, 0, 0, 1.0)
         # self.setColor(box1_id, 0.8, 0.4, 0, 1.0)
         # self.setColor(box2_id, 0.8, 0.4, 0, 1.0)
         #
-        # # Make the target yellow
-        # self.setColor(target_id, 0.9, 0.9, 0, 1.0)
-        #
-        # # Send the colors to the planning scene
-        # self.sendColors()
-        #
+        # Make the target yellow
+        self.setColor(target_id, 0.9, 0.9, 0, 1.0)
+
+        # Send the colors to the planning scene
+        self.sendColors()
+
         # # Set the support surface name to the table object
         # arm.set_support_surface_name(table_id)
         #
-        # # Specify a pose to place the target after being picked up
+        # Specify a pose to place the target after being picked up
         # place_pose = PoseStamped()
         # place_pose.header.frame_id = REFERENCE_FRAME
-        # place_pose.pose.position.x = table_pose.pose.position.x - 0.03
-        # place_pose.pose.position.y = -0.15
-        # place_pose.pose.position.z = table_ground + table_size[2] + target_size[2] / 2.0
-        # place_pose.pose.orientation.w = 1.0
-        #
-        # # Initialize the grasp pose to the target pose
-        # grasp_pose = target_pose
-        #
-        # # Shift the grasp pose by half the width of the target to center it
-        # grasp_pose.pose.position.y -= target_size[1] / 2.0
-        #
-        # # Generate a list of grasps
-        # grasps = self.make_grasps(grasp_pose, [target_id], [target_size[1] - self.gripper_tighten])
-        #
-        # # Track success/failure and number of attempts for pick operation
-        # result = MoveItErrorCodes.FAILURE
-        # n_attempts = 0
-        #
-        # # Repeat until we succeed or run out of attempts
-        # while result != MoveItErrorCodes.SUCCESS and n_attempts < max_pick_attempts:
-        #     rospy.loginfo("Pick attempt #" + str(n_attempts))
-        #     for grasp in grasps:
-        #         # Publish the grasp poses so they can be viewed in RViz
-        #         self.gripper_pose_pub.publish(grasp.grasp_pose)
-        #         rospy.sleep(0.2)
-        #
-        #         result = arm.pick(target_id, grasps)
-        #         if result == MoveItErrorCodes.SUCCESS:
-        #             break
-        #
-        #     n_attempts += 1
-        #     rospy.sleep(0.2)
-        #
-        # # If the pick was successful, attempt the place operation
-        # if result == MoveItErrorCodes.SUCCESS:
-        #     rospy.loginfo("  Pick: Done!")
-        #     # Generate valid place poses
-        #     places = self.make_places(target_id, place_pose)
-        #
-        #     success = False
-        #     n_attempts = 0
-        #
-        #     # Repeat until we succeed or run out of attempts
-        #     while not success and n_attempts < max_place_attempts:
-        #         rospy.loginfo("Place attempt #" + str(n_attempts))
-        #         for place in places:
-        #             # Publish the place poses so they can be viewed in RViz
-        #             self.gripper_pose_pub.publish(place)
-        #             rospy.sleep(0.2)
-        #
-        #             success = arm.place(target_id, place)
-        #             if success:
-        #                 break
-        #
-        #         n_attempts += 1
-        #         rospy.sleep(0.2)
-        #
-        #     if not success:
-        #         rospy.logerr("Place operation failed after " + str(n_attempts) + " attempts.")
-        #     else:
-        #         rospy.loginfo("  Place: Done!")
-        # else:
-        #     rospy.logerr("Pick operation failed after " + str(n_attempts) + " attempts.")
-        #
-        # # Return the arm to the "resting" pose stored in the SRDF file (passing through right_up)
-        # arm.set_named_target('right_up')
-        # arm.go()
-        #
-        # arm.set_named_target('resting')
-        # arm.go()
-        #
-        # # Open the gripper to the neutral position
-        # gripper.set_joint_value_target(self.gripper_neutral)
-        # gripper.go()
+        # place_pose.pose.position.x = 0.21951
+        # place_pose.pose.position.y = -0.14496
+        # place_pose.pose.position.z = 0.37705
+        # place_pose.pose.orientation.x = 0.01426
+        # place_pose.pose.orientation.y = 0.02701
+        # place_pose.pose.orientation.z = -0.46666
+        # place_pose.pose.orientation.w = 0.88390
+
+        place_pose = PoseStamped()
+        place_pose.header.frame_id = REFERENCE_FRAME
+        place_pose.pose.position.x = 0.36 - 0.03
+        place_pose.pose.position.y = -0.15
+        place_pose.pose.position.z = 0.4 + 0.01 + target_size[2] / 2.0
+        place_pose.pose.orientation.w = 1.0
+
+        # Initialize the grasp pose to the target pose
+        grasp_pose = target_pose
+
+        # Shift the grasp pose by half the width of the target to center it
+        grasp_pose.pose.position.y -= target_size[1] / 2.0
+
+        # Generate a list of grasps
+        grasps = self.make_grasps(grasp_pose, [target_id], [target_size[1] - self.gripper_tighten])
+
+        # Track success/failure and number of attempts for pick operation
+        result = MoveItErrorCodes.FAILURE
+        n_attempts = 0
+
+        # Repeat until we succeed or run out of attempts
+        while result != MoveItErrorCodes.SUCCESS and n_attempts < max_pick_attempts:
+            rospy.loginfo("Pick attempt #" + str(n_attempts))
+            for grasp in grasps:
+                # Publish the grasp poses so they can be viewed in RViz
+                self.gripper_pose_pub.publish(grasp.grasp_pose)
+                rospy.sleep(0.2)
+
+                result = arm.pick(target_id, grasps)
+                if result == MoveItErrorCodes.SUCCESS:
+                    break
+
+            n_attempts += 1
+            rospy.sleep(0.2)
+
+        # If the pick was successful, attempt the place operation
+        if result == MoveItErrorCodes.SUCCESS:
+            rospy.loginfo("  Pick: Done!")
+            # Generate valid place poses
+            places = self.make_places(target_id, place_pose)
+
+            success = False
+            n_attempts = 0
+
+            # Repeat until we succeed or run out of attempts
+            while not success and n_attempts < max_place_attempts:
+                rospy.loginfo("Place attempt #" + str(n_attempts))
+                for place in places:
+                    # Publish the place poses so they can be viewed in RViz
+                    self.gripper_pose_pub.publish(place)
+                    rospy.sleep(0.2)
+
+                    success = arm.place(target_id, place)
+                    if success:
+                        break
+
+                n_attempts += 1
+                rospy.sleep(0.2)
+
+            if not success:
+                rospy.logerr("Place operation failed after " + str(n_attempts) + " attempts.")
+            else:
+                rospy.loginfo("  Place: Done!")
+        else:
+            rospy.logerr("Pick operation failed after " + str(n_attempts) + " attempts.")
+
+        # Return the arm to the "resting" pose stored in the SRDF file (passing through right_up)
+        arm.set_named_target('right_up')
+        arm.go()
+
+        arm.set_named_target('resting')
+        arm.go()
+
+        # Open the gripper to the neutral position
+        gripper.set_joint_value_target(self.gripper_neutral)
+        gripper.go()
 
 #To here
 
