@@ -115,10 +115,10 @@ class MoveItDemo:
         arm.set_planning_time(5)
 
         # Set a limit on the number of pick attempts before bailing
-        max_pick_attempts = 3
+        max_pick_attempts = 1
 
         # Set a limit on the number of place attempts
-        max_place_attempts = 3
+        max_place_attempts = 1
         rospy.loginfo("Scaling for MoveIt timeout=" + str(rospy.get_param('/move_group/trajectory_execution/allowed_execution_duration_scaling')))
 
         # Give each of the scene objects a unique name
@@ -127,6 +127,7 @@ class MoveItDemo:
         box2_id = 'box2'
         target_id = 'target'
         tool_id = 'tool'
+        ground_id = 'ground'
 
         # Remove leftover objects from a previous run
         self.scene.remove_world_object(table_id)
@@ -134,6 +135,7 @@ class MoveItDemo:
         self.scene.remove_world_object(box2_id)
         self.scene.remove_world_object(target_id)
         self.scene.remove_world_object(tool_id)
+        self.scene.remove_world_object(ground_id)
 
         # Remove any attached objects from a previous session
         self.scene.remove_attached_object(GRIPPER_FRAME, target_id)
@@ -177,94 +179,86 @@ class MoveItDemo:
         # rospy.loginfo("Back from user")
 
 #From here
-        #
-        # # Set the height of the table off the ground
-        # table_ground = 0.4
-        #
-        # # Set the dimensions of the scene objects [l, w, h]
-        # table_size = [0.2, 0.7, 0.01]
-        # box1_size = [0.1, 0.05, 0.05]
+
+        # Set the height of the table off the ground
+        table_ground = -0.005
+
+        # Set the dimensions of the scene objects [l, w, h]
+        table_size = [0.2, 0.7, 0.01]
+        box1_size = [0.03, 0.04, 0.04]
+        ground_size = [1, 1, 0.005]
         # box2_size = [0.05, 0.05, 0.15]
         #
         # Set the target size [l, w, h]
-        target_size = [0.014, 0.01, 0.035]
-        #
-        # # Add a table top and two boxes to the scene
-        # table_pose = PoseStamped()
-        # table_pose.header.frame_id = REFERENCE_FRAME
-        # table_pose.pose.position.x = 0.36
-        # table_pose.pose.position.y = 0.0
-        # table_pose.pose.position.z = table_ground + table_size[2] / 2.0
-        # table_pose.pose.orientation.w = 1.0
-        # self.scene.add_box(table_id, table_pose, table_size)
-        #
+        target_size = [0.015, 0.011, 0.036]
+
+        # Add a table top and two boxes to the scene
+        table_pose = PoseStamped()
+        table_pose.header.frame_id = REFERENCE_FRAME
+        table_pose.pose.position.x = 0.20
+        table_pose.pose.position.y = 0.0
+        table_pose.pose.position.z = table_ground + table_size[2] / 2.0
+        table_pose.pose.orientation.w = 1.0
+        self.scene.add_box(table_id, table_pose, table_size)
+
+        ground_pose = PoseStamped()
+        ground_pose.header.frame_id = REFERENCE_FRAME
+        ground_pose.pose.position.x = 0.0
+        ground_pose.pose.position.y = 0.0
+        ground_pose.pose.position.z = table_ground
+        ground_pose.pose.orientation.w = 1.0
+        self.scene.add_box(ground_id, ground_pose, ground_size)
+
         # box1_pose = PoseStamped()
         # box1_pose.header.frame_id = REFERENCE_FRAME
-        # box1_pose.pose.position.x = table_pose.pose.position.x - 0.04
-        # box1_pose.pose.position.y = 0.0
+        # box1_pose.pose.position.x = 0.375
+        # box1_pose.pose.position.y = -0.01 - 0.035 - 0.09
         # box1_pose.pose.position.z = table_ground + table_size[2] + box1_size[2] / 2.0
         # box1_pose.pose.orientation.w = 1.0
         # self.scene.add_box(box1_id, box1_pose, box1_size)
-        #
-        # box2_pose = PoseStamped()
-        # box2_pose.header.frame_id = REFERENCE_FRAME
-        # box2_pose.pose.position.x = table_pose.pose.position.x - 0.06
-        # box2_pose.pose.position.y = 0.2
-        # box2_pose.pose.position.z = table_ground + table_size[2] + box2_size[2] / 2.0
-        # box2_pose.pose.orientation.w = 1.0
-        # self.scene.add_box(box2_id, box2_pose, box2_size)
-        #
-        # Set the target pose in between the boxes and on the table
+
+        # # Set the target pose in between the boxes and on the table
         # target_pose = PoseStamped()
         # target_pose.header.frame_id = REFERENCE_FRAME
-        # target_pose.pose.position.x = 0.26338
-        # target_pose.pose.position.y = 0.16492
-        # target_pose.pose.position.z = 0.37705
-        # target_pose.pose.orientation.x = -0.01033
-        # target_pose.pose.orientation.y = 0.02875
-        # target_pose.pose.orientation.z = 0.33817
-        # target_pose.pose.orientation.w = 0.94058
+        # target_pose.pose.position.x = table_pose.pose.position.x + 0.1
+        # target_pose.pose.position.y = 0.0
+        # target_pose.pose.position.z = table_ground + table_size[2] + target_size[2] / 2.0
+        # target_pose.pose.orientation.w = 1.0
 
+        # Set the target pose in between the boxes and on the table
         target_pose = PoseStamped()
         target_pose.header.frame_id = REFERENCE_FRAME
-        target_pose.pose.position.x = 0.36 - 0.03
-        target_pose.pose.position.y = 0.1
-        target_pose.pose.position.z = 0.4 + 0.01 + target_size[2] / 2.0
+        target_pose.pose.position.x = 0.20
+        target_pose.pose.position.y = 0.10
+        target_pose.pose.position.z = table_ground + table_size[2] + target_size[2] / 2.0
         target_pose.pose.orientation.w = 1.0
+
 
         # Add the target object to the scene
         self.scene.add_box(target_id, target_pose, target_size)
 
-        # # Make the table red and the boxes orange
-        # self.setColor(table_id, 0.8, 0, 0, 1.0)
-        # self.setColor(box1_id, 0.8, 0.4, 0, 1.0)
-        # self.setColor(box2_id, 0.8, 0.4, 0, 1.0)
-        #
+        # Make the table red
+        self.setColor(table_id, 0.8, 0, 0, 1.0)
+
+        # And ground orange
+        self.setColor(ground_id, 0.8, 0.4, 0, 1.0)
+
         # Make the target yellow
         self.setColor(target_id, 0.9, 0.9, 0, 1.0)
 
         # Send the colors to the planning scene
         self.sendColors()
 
-        # # Set the support surface name to the table object
-        # arm.set_support_surface_name(table_id)
-        #
-        # Specify a pose to place the target after being picked up
-        # place_pose = PoseStamped()
-        # place_pose.header.frame_id = REFERENCE_FRAME
-        # place_pose.pose.position.x = 0.21951
-        # place_pose.pose.position.y = -0.14496
-        # place_pose.pose.position.z = 0.37705
-        # place_pose.pose.orientation.x = 0.01426
-        # place_pose.pose.orientation.y = 0.02701
-        # place_pose.pose.orientation.z = -0.46666
-        # place_pose.pose.orientation.w = 0.88390
+        # Set the support surface name to the table object
+        arm.set_support_surface_name(table_id)
 
+
+        # Specify a pose to place the target after being picked up
         place_pose = PoseStamped()
         place_pose.header.frame_id = REFERENCE_FRAME
-        place_pose.pose.position.x = 0.36 - 0.03
-        place_pose.pose.position.y = -0.15
-        place_pose.pose.position.z = 0.4 + 0.01 + target_size[2] / 2.0
+        place_pose.pose.position.x = 0.20
+        place_pose.pose.position.y = -0.10
+        place_pose.pose.position.z = table_ground + table_size[2] + target_size[2] / 2.0
         place_pose.pose.orientation.w = 1.0
 
         # Initialize the grasp pose to the target pose
@@ -272,6 +266,7 @@ class MoveItDemo:
 
         # Shift the grasp pose by half the width of the target to center it
         grasp_pose.pose.position.y -= target_size[1] / 2.0
+        grasp_pose.pose.position.z -= target_size[2] / 3.0
 
         # Generate a list of grasps
         grasps = self.make_grasps(grasp_pose, [target_id], [target_size[1] - self.gripper_tighten])
@@ -279,6 +274,8 @@ class MoveItDemo:
         # Track success/failure and number of attempts for pick operation
         result = MoveItErrorCodes.FAILURE
         n_attempts = 0
+
+        # return
 
         # Repeat until we succeed or run out of attempts
         while result != MoveItErrorCodes.SUCCESS and n_attempts < max_pick_attempts:
@@ -336,8 +333,6 @@ class MoveItDemo:
         # Open the gripper to the neutral position
         gripper.set_joint_value_target(self.gripper_neutral)
         gripper.go()
-
-#To here
 
         rospy.sleep(1)
 
@@ -609,7 +604,12 @@ class MoveItDemo:
         pose.orientation.z = quat[2]
         pose.orientation.w = quat[3]
         return pose
+    # TODO: Add function for calculating if given xyz is in range
 
 
 if __name__ == "__main__":
-    MoveItDemo()
+    try:
+        MoveItDemo()
+    except KeyboardInterrupt:
+        rospy.logerr("got SIGTERM, Exiting..")
+        moveit_commander.os._exit(0)
