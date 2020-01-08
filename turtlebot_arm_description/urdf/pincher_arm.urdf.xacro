@@ -28,6 +28,6 @@
            as pick and place and other demos assume this location -->
       <!-- origin xyz="0.1 0.03 0.435"/-->  
 	<!-- Here changed to assume that arm is mounted on the table -->
-	<origin xyz="-0.0249 0.0 0.0634" />
+	<origin xyz="-0.0444 0.0 0.0634" />
     </turtlebot_arm>
 </robot>
