@@ -312,7 +312,7 @@
     <link name="${name}_link">
       <xacro:box_inertia length="0.002" width="0.040" height="0.075" mass="0.00001"/>
       <visual>
-        <origin xyz="0.016 0 -.015 " rpy="${M_PI} ${-M_PI/2} ${M_PI/2}"/>
+        <origin xyz="0.016 0 -.015 " rpy="${M_PI/2} ${M_PI/2} ${M_PI/2}"/>
         <geometry>
           <mesh filename="package://turtlebot_arm_description/meshes/pincher_finger_base.stl" scale=".01 .01 .01"/>
         </geometry>
