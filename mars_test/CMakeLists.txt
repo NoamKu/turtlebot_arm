@@ -5,4 +5,4 @@ find_package(catkin REQUIRED)
 
 catkin_package()
 
-install(PROGRAMS bin/arm_test.py DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+install(PROGRAMS bin/arm_test.py bin/grip_test.py DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})

@@ -7,46 +7,50 @@
     
     <!-- gripper joint -->
     <dynamixel_AX12_fixed parent="arm_wrist_F3_0_link" name="gripper_servo" >
-      <origin xyz="0 0 ${-AX12_WIDTH/2}" rpy="${M_PI/2} ${M_PI} ${M_PI/2}"/>
+      <origin xyz="0 0 ${-AX12_WIDTH/2}" rpy="${M_PI/2} 0 ${M_PI/2}"/>
     </dynamixel_AX12_fixed>
     
      <gripper_finger_base parent="gripper_servo_link" name="gripper_finger_base" color="${color}">
-      <origin xyz="0.01  ${AX12_WIDTH} 0" rpy="${M_PI/2} ${-M_PI} ${M_PI/2}"/>
+      <origin xyz="${-(0.065-AX12_HEIGHT)} ${-AX12_WIDTH} ${-AX12_LENGTH/2}" rpy="${M_PI/2} 0 0"/>
     </gripper_finger_base>
   
      <!-- Finger 1 --> 
     <joint name="gripper_joint" type="prismatic">
-      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <origin xyz="0 0 0" rpy="0 0 ${-M_PI/2}"/>
       <axis xyz="1 0 0"/>
       <limit effort="30" velocity="0.5" lower="0.002" upper="0.031"/>
-      <parent link="gripper_servo_link"/>
+      <parent link="gripper_finger_base_link"/>
       <child link="gripper_active_link"/>
     </joint> 
     
     <pincher_gripper name="gripper_active" color="${color}" >
-      <origin xyz="-0.0086 0.0414 0" rpy="${-M_PI/2} 0 0"/>
+<!--      <origin xyz="-0.0086 0.0414 0" rpy="${-M_PI/2} 0 0"/>-->
+	<origin xyz="${-0.0086+AX12_LENGTH/3} ${0.0414-AX12_HEIGHT/3} 0" rpy="0 0 0"/>
     </pincher_gripper>
      
     <!-- Finger 2 --> 
-    <!-- Note: currently static but should be a Mimic of Finger 1 -->
+    <!-- Note: currently static but should be a Mimic of Finger 1
     <joint name="gripper2_joint" type="fixed">
-      <parent link="gripper_servo_link"/>
+      <origin xyz="0 0 0" rpy="0 0 ${-M_PI/2}"/>
+      <parent link="gripper_finger_base_link"/>
       <child link="gripper_active2_link"/>
-    </joint>  
+    </joint-->  
     
     <pincher_gripper name="gripper_active2" color="${color}" >
-      <origin xyz="-0.0314 0.0414 0" rpy="${-M_PI/2} ${M_PI} 0"/>
+<!--      <origin xyz="-0.0314 0.0414 0" rpy="${-M_PI/2} ${M_PI} 0"/>-->
+	<origin xyz="${-0.0314+AX12_LENGTH/3} ${0.0414-AX12_HEIGHT/3} 0" rpy="${M_PI} ${M_PI} 0"/>
     </pincher_gripper>
       
     <!-- Using Mimic -->
     <!-- gripper 2 joint -->
-    <!--  ### Mimic would be better but causes Missing Joint error in Moveit 
+    <!--  ### Mimic would be better but causes Missing Joint error in Moveit -->
       <joint name="gripper2_joint" type="prismatic">
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <axis xyz="0 0 1"/>
+<!--      <origin xyz="0 0 0" rpy="0 0 0"/> -->
+      <origin xyz="0 0 0" rpy="0 0 ${-M_PI/2}"/>
+      <axis xyz="1 0 0"/>
       <limit effort="30" velocity="0.5" lower="0.002" upper="0.031"/>
-      <parent link="gripper_servo_link"/>
+      <parent link="gripper_finger_base_link"/>
       <child link="gripper_active2_link"/>
       <mimic joint="gripper_joint" multiplier="-.5"  offset = "0"/>
-    </joint-->  
+    </joint>  
 </robot>
