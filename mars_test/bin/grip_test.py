@@ -30,6 +30,7 @@
 
 import sys
 import rospy
+import rospkg
 import numpy as np
 import tf2_ros
 import tf2_geometry_msgs
@@ -37,6 +38,7 @@ import moveit_commander
 
 from math import atan2
 from copy import deepcopy
+
 from geometry_msgs.msg import Pose, PoseStamped
 from moveit_msgs.msg import PlanningScene, ObjectColor
 from moveit_msgs.msg import CollisionObject, AttachedCollisionObject
@@ -57,12 +59,15 @@ GRIPPER_PARAM = '/gripper_controller'
 REFERENCE_FRAME = 'base_link'
 ARM_BASE_FRAME = 'arm_base_link'
 
+PI = 3.14
+
 class MoveItDemo:
     def __init__(self):
         # Initialize the move_group API
         moveit_commander.roscpp_initialize(sys.argv)
 
         rospy.init_node('moveit_demo')
+        rospack = rospkg.RosPack()
 
         # We need a tf2 listener to convert poses into arm reference base
         try:
@@ -129,6 +134,10 @@ class MoveItDemo:
         tool_id = 'tool'
         ground_id = 'ground'
 
+        brick1_id = 'brick1'
+        brick2_id = 'brick2'
+        brick3_id = 'brick3'
+
         # Remove leftover objects from a previous run
         self.scene.remove_world_object(table_id)
         self.scene.remove_world_object(box1_id)
@@ -144,16 +153,17 @@ class MoveItDemo:
         rospy.sleep(1)
 
         # Start the arm in the "arm_up" pose stored in the SRDF file
-        rospy.loginfo("Set Arm: right_up")
-        arm.set_named_target('right_up')
-        if arm.go() != True:
-            rospy.logwarn("  Go failed")
+    #    rospy.loginfo("Set Arm: right_up")
+    #    arm.set_named_target('right_up')
+    #    if arm.go() != True:
+    #        rospy.logwarn("  Go failed")
 
         # Move the gripper to the open position
-        rospy.loginfo("Set Gripper: Open " +  str(self.gripper_opened))
-        gripper.set_joint_value_target(self.gripper_opened)
-        if gripper.go() != True:
-            rospy.logwarn("  Go failed")
+    #    rospy.loginfo("Set Gripper: Open " +  str(self.gripper_opened))
+    #    gripper.set_joint_value_target(self.gripper_opened)
+    #    if gripper.go() != True:
+    #        rospy.logwarn("  Go failed")
+
         # rospy.loginfo("Going to user")
         # while(1):
         #     txt = raw_input("Type o to open, c to close, n for neutral, q to quit: \n")
@@ -190,7 +200,9 @@ class MoveItDemo:
         # box2_size = [0.05, 0.05, 0.15]
         #
         # Set the target size [l, w, h]
-        target_size = [0.015, 0.011, 0.036]
+        target_size = [0.011, 0.008, 0.039]
+
+
 
         # Add a table top and two boxes to the scene
         table_pose = PoseStamped()
@@ -230,12 +242,24 @@ class MoveItDemo:
         target_pose.header.frame_id = REFERENCE_FRAME
         target_pose.pose.position.x = 0.20
         target_pose.pose.position.y = 0.10
-        target_pose.pose.position.z = table_ground + table_size[2] + target_size[2] / 2.0
+        # target_pose.pose.position.z = table_ground + table_size[2]  + target_size[2]
+        target_pose.pose.position.z = table_ground + table_size[2]
+        # target_pose.pose.orientation.x = PI
         target_pose.pose.orientation.w = 1.0
 
 
+
+
+
         # Add the target object to the scene
-        self.scene.add_box(target_id, target_pose, target_size)
+        # self.scene.add_box(target_id, target_pose, target_size)
+
+        pkg_path = rospack.get_path('mars_test')
+
+        brick1_fileloc = pkg_path + '/meshes/1_1.stl'
+        rospy.loginfo(brick1_fileloc)
+        # return
+        self.scene.add_mesh(target_id, target_pose, brick1_fileloc, (0.01, 0.01, 0.01))
 
         # Make the table red
         self.setColor(table_id, 0.8, 0, 0, 1.0)
@@ -275,7 +299,7 @@ class MoveItDemo:
         result = MoveItErrorCodes.FAILURE
         n_attempts = 0
 
-        # return
+        return
 
         # Repeat until we succeed or run out of attempts
         while result != MoveItErrorCodes.SUCCESS and n_attempts < max_pick_attempts:
