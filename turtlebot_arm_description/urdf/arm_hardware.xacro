@@ -358,4 +358,29 @@
       <gravity>true</gravity>
     </gazebo>
   </xacro:macro>
+
+    <xacro:macro name="camera_base" params="name color *origin">
+      <link name="${name}_link">
+      <xacro:box_inertia length="0.033" width="0.039" height="0.049" mass="0.00001"/>
+      <visual>
+        <xacro:insert_block name="origin"/>
+        <geometry>
+          <mesh filename="package://turtlebot_arm_description/meshes/camera_base.stl" scale=".01 .01 .01"/>
+        </geometry>
+        <material name="${color}"/>
+      </visual>
+      <collision>
+        <xacro:insert_block name="origin"/>
+        <geometry>
+          <box size="0.033 0.039 0.049"/>
+        </geometry>
+      </collision>
+    </link>
+  
+    <gazebo reference="${name}_link">
+      <material>Gazebo/${color}</material>
+      <selfCollide>true</selfCollide>
+      <gravity>true</gravity>
+    </gazebo>
+  </xacro:macro>
 </robot>
