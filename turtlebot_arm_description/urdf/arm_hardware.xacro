@@ -320,7 +320,7 @@
       </visual>
       
       <collision>
-        <origin xyz="0.016 0.0 -0.015" rpy="0 0 0"/>
+        <origin xyz="0.016 0.0 -0.015" rpy="0 ${M_PI/2} 0"/>
         <geometry>
           <box size="0.002 0.065 0.075"/>
         </geometry>
@@ -372,7 +372,7 @@
       <collision>
         <xacro:insert_block name="origin"/>
         <geometry>
-          <box size="0.033 0.039 0.049"/>
+          <box size="0.039 0.032 0.049"/>
         </geometry>
       </collision>
     </link>

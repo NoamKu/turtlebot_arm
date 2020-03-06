@@ -80,7 +80,7 @@
         <joint name="gripper_joint" value="0.031" />
     </group_state>
     <group_state name="grip_closed" group="gripper">
-        <joint name="gripper_joint" value="0.002" />
+        <joint name="gripper_joint" value="0.007" />
     </group_state>
     <group_state name="grip_mid" group="gripper">
         <joint name="gripper_joint" value="0.015" />
