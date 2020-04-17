@@ -53,6 +53,7 @@
                   another_package/GraspPlanningPipeline
                   " />
     -->
+    <param name="capabilities" value="move_group/MoveGroupGetPlanningSceneService" />
 
     <!-- inhibit these default MoveGroup capabilities -->
     <!--
